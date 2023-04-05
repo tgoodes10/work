@@ -1,0 +1,202 @@
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "A3_functions.h"
+
+float getAverage(float pollutants[24]){
+        int count = 0;
+        float sum = 0;
+
+                for (int i = 0; i < 24; i++){
+                if (pollutants[i] != -9999 && pollutants[i] != $                sum += pollutants[i];
+                count++;}}
+
+                        if (count == 0){
+                        return 0;}
+
+return sum / count;}
+
+int readAPollutantFile(char filename[], char location[], float pollutantAverages[], char dates[][MAX_STRING_SIZE]){
+        FILE *fp = fopen(filename, "r");
+                if (fp == NULL){
+                printf("Could not open file %s\n", filename);
+return 0; }
+
+        fgets(location, MAX_STRING_SIZE, fp);
+        strtok(location, "\n");
+        float pollutants[24];
+        char date[MAX_STRING_SIZE];
+        int count = 0;
+
+        while (fscanf(fp, "%s", date) ==1){
+                for (int i = 0; i < 24; i++){
+                fscanf(fp, "%f", &pollutants[i]); }
+
+        pollutantAverages[count] = getAverage(pollutants);
+
+        strcpy(dates[count], date);
+
+        count++; }
+
+ fclose(fp);
+
+return count; }
+
+
+struct Location readData(){
+
+        char filename[MAX_STRING_SIZE];
+        bool fileError = false;
+        Location locationName[MAX_STRING_SIZE];
+
+ for (int i = 0; i < 3; i++){
+        printf("Please enter the filename for the 03 csv file.\n");
+        fgets(filename, MAX_STRING_SIZE, stdin);
+        filename[strcspn(filename, "\n")] = '\0';
+
+        if(!readAPollutantFile(filename,i, &locationName)){
+        fileError = true;
+        break; }
+}
+        if(fileError){
+        printf("ERROR: File %s does not exist.\n");
+        locationName[0] = '\0';
+        return Location;
+
+ int numDays = 0;
+        for (int i = 0; i < 3; i++){
+        if (locationName[i].numDays > numDays){
+        numDays = locationName[i].numDays; }
+}
+        locationName = numDays;
+        for (int i = 0; i < numDays; i++){
+
+        locationName->dates[i][0] = '\0';
+        for (int j = 0; j < 3;j++){
+        if (i < locationName->numDays[j] && locationName->dates[j][i][0] != '\0'){
+        strcpy(locationName->dates[i],locationName->dates[i][j]);
+        break;}
+        }
+}
+
+ for (int i = 0; i < numDays; i++){
+        float pollutantAverages[3];
+        bool hasData = true;
+        for (int j = 0; j < 3;j++){
+        if (i >=locationName->numDays[j] || locationName->pollutantAverages[j][i] < 0){
+        hasData = false;
+        break;}
+
+        pollutantAverages[j] = locationName->pollutantAverages[j][i];}
+
+        if (hasData){
+        float standardAQHIs = calculateAQHIs(pollutantAverages, false);
+        float seasonalAQHIs = calculateAQHIs(pollutantAverages, true);
+        locationName.standardAQHIs[i] = standardAQHIs;
+        locationName.seasonalAQHIs[i] = seasonalAQHIs; }
+
+}
+        return locationName; }
+
+
+void printTableByDate(Location locations[],int numLocations){
+
+        if(numLocations == 0){
+                printf("No location data has been entered. Please enter new location and data and try again.\n");
+        return;}
+
+int choice;
+        do{
+               printf("Choose your AQHI settings:\n");
+                printf("        1. Calculate Standard Conditions\n");
+                printf("        2. Calculate Seasonal Conditions\n");
+                scanf(" %d", &choice);
+}
+        while (choice < 1 || choice > 2);
+
+
+        int year, month, day;
+                printf("Please enter a date.\n");
+                scanf("%d %d %d", &year, &month, &day);
+
+        printf("+-----------------------------+---------+\n");
+        printf("| Location                    |AQHI     |\n");
+        printf("+-----------------------------+---------+\n");
+bool dateFound = false;
+        for (int i = 0; i < numLocations; i++){
+        bool locationFound = false;
+        for (int j = 0; j < locations[i].numDays; j++){
+                if (locations[i].dates[j].month == month && locations[i].dates[j].day == day && locations[i].dates[j].year == year){
+                locationFound = true;
+                dateFound = true;
+                break; }
+
+        if (locationFound){
+                printf("| %-20s | ", locations[i].locationName);
+        if (choice == 1){
+                printTableRow(locations[i], month, day, year);}
+        else{
+                printTableRow(locations[i], month, day, year);}
+        printf("|\n");
+}}
+        if (!dateFound){
+                printf("| %-20s |          |\n", "####-##-## not found."); }
+
+        printf("+-------------------------+------------+\n");
+}
+
+void printTableByLocation(Location locations[], int numLocations){
+    if (numLocations == 0){
+        printf("No location data has been entered. Please enter new location and data and try again.\n");
+        return;
+
+    }
+
+    char locationName[MAX_NAME_LENGTH];
+    printf("Enter the location name to search for: ");
+    scanf("%s", locationName);
+
+    int index = -1;
+    for (int i = 0; i < numLocations; i++){
+        if (strcmp(locations[i].name, locationName) == 0){
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1){
+        printf("%s not found.\n", locationName);
+        return;
+    }
+
+    int choice;
+    do{
+        printf("\nSelect AQHI values: \n");
+        printf("1. Standard AQHI\n");
+        printf("2. Seasonal AQHI\n");
+        printf("Enter choice (1-2): ");
+        scanf("%d", &choice);
+    }while (choice < 1 || choice > 2);
+
+    printf("\n");
+        return;
+    }
+
+    int choice;
+    do{
+        printf("\nSelect AQHI values: \n");
+        printf("1. Standard AQHI\n");
+        printf("2. Seasonal AQHI\n");
+        printf("Enter choice (1-2): ");
+        scanf("%d", &choice);
+    }while (choice < 1 || choice > 2);
+
+    printf("\n");
+    printTableHead();
+    for (int i = 0; i < locations[index].numDates; i++){
+        printTableRow(locations[index].dates[i], choice);
+    }
+    printTableFooter();
+}
